@@ -14,6 +14,10 @@ class WordsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         itemView.findViewById<AppCompatTextView>(R.id.tv_word1).text = data.word1
         itemView.findViewById<AppCompatTextView>(R.id.tv_word2).text = data.word2
 
+        itemView.setOnClickListener {
+            itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
+        }
+
 
     }
 

@@ -23,9 +23,9 @@ class WordsItemAdapter(val data: MutableList<WordsItem>) : RecyclerView.Adapter<
 
 
         //todo show word 2
-        holder.itemView.setOnClickListener {
-            holder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
-        }
+//        holder.itemView.setOnClickListener {
+//            holder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
+//        }
         return holder.bind(data[position])
 
     }

@@ -1,15 +1,31 @@
 package com.my.livedic
 
+import android.media.audiofx.DynamicsProcessing
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Config
+import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.api.client.extensions.android.http.AndroidHttp
+import com.google.api.client.http.HttpTransport
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.services.sheets.v4.Sheets
+import com.google.api.services.sheets.v4.model.Sheet
+import com.google.api.services.sheets.v4.model.ValueRange
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
+    val KEY = "AIzaSyA6HVaf1oX3PDynG8p5y8FQhP-OqJQcgnM"
+    val LINK =
+        "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
+
+    private var sheetsList = mutableListOf(mutableListOf(WordsItem("", "")))
     private val wordsList: MutableList<WordsItem> =
         mutableListOf(
             WordsItem("Кто", "O que"),
@@ -68,11 +84,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         val rv = findViewById<RecyclerView>(R.id.rv_words)
         val linearLayoutManager = LinearLayoutManager(this)
         rv.layoutManager = linearLayoutManager
         rv.adapter = WordsItemAdapter(wordsList)
-
 
 
         val itemTouchHelper = ItemTouchHelper(object :
@@ -86,15 +102,53 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                    (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-//                if (direction == ItemTouchHelper.LEFT) {
-//                    viewHolder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility =
-//                        View.VISIBLE
-//                }
+                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+
+                if (direction == ItemTouchHelper.LEFT) {
+                    loadSheets()
+
+
+                    Toast.makeText(parent.baseContext, "${sheetsList.size}", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
 
         })
         itemTouchHelper.attachToRecyclerView(rv)
+
+
+    }
+
+    private fun loadSheets() {
+        val transport = AndroidHttp.newCompatibleTransport()
+        val factory = JacksonFactory.getDefaultInstance()
+        val sheetsService = Sheets.Builder(transport, factory, null)
+            .setApplicationName("LiveDic")
+            .build()
+
+        val spreadSheetsId = "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
+
+        Thread {
+            Runnable{
+                try {
+                    val range = "Sheet1!C1:D50"
+                    val result =
+                        sheetsService.spreadsheets().values().get(spreadSheetsId, range)
+                            .setKey(KEY)
+                            .execute()
+
+                    val numRows = result.getValues().size
+                    Log.d("SUCCESS.", "rows retrived " + numRows);
+
+//                    sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
+
+                } catch (e: Exception) {
+                    //                        Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
+                }
+
+            }
+
+        }.start()
 
 
     }
