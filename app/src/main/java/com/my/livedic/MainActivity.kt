@@ -21,7 +21,7 @@ import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
-    val KEY = "AIzaSyA6HVaf1oX3PDynG8p5y8FQhP-OqJQcgnM"
+    val KEY = "-OqJQcgnM"
     val LINK =
         "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
 
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
         val spreadSheetsId = "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
 
         Thread {
-            Runnable{
+            Runnable {
                 try {
                     val range = "Sheet1!C1:D50"
                     val result =
@@ -149,7 +149,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }.start()
-
 
     }
 }
