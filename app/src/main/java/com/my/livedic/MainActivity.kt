@@ -1,31 +1,30 @@
 package com.my.livedic
 
-import android.media.audiofx.DynamicsProcessing
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Config
 import android.util.Log
-import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.api.client.extensions.android.http.AndroidHttp
-import com.google.api.client.http.HttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.sheets.v4.Sheets
-import com.google.api.services.sheets.v4.model.Sheet
-import com.google.api.services.sheets.v4.model.ValueRange
-import java.lang.Exception
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 class MainActivity : AppCompatActivity() {
 
-    val KEY = ""  //fixme
+    val TAG = "Add db"
+    val KEY = "AIzaSyAhSaOtLp9bK4OA9LTudTQ9N-woZztYWrc"
     val LINK =
         "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
 
-        private var sheetsList: MutableList<MutableList<WordsItem>> =
+    private var sheetsList: MutableList<MutableList<WordsItem>> =
         mutableListOf(mutableListOf(WordsItem("1", "1")))
     private val wordsList: MutableList<WordsItem> =
         mutableListOf(
@@ -83,17 +82,37 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        loadSheets()
 
         super.onCreate(savedInstanceState)
+        loadSheets()
 
         setContentView(R.layout.activity_main)
 
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("Words")
+            .add(sheetsList)
+            .addOnCanceledListener {
+                OnSuccessListener<DocumentReference> { documentReference ->
+                    Log.d(
+                        TAG,
+                        "DocumentSnapshot added with ID: " + documentReference.getId()
+                    );
+                }
+
+            }
+            .addOnFailureListener {
+                object : OnFailureListener {
+                    override fun onFailure(p0: java.lang.Exception) {
+                        Log.w(TAG, "Error adding document", p0);                    }
+                }
+            }
 
         val rv = findViewById<RecyclerView>(R.id.rv_words)
         val linearLayoutManager = LinearLayoutManager(this)
         rv.layoutManager = linearLayoutManager
-        rv.adapter = WordsItemAdapter(sheetsList)
+        rv.adapter = WordsItemAdapter(createList(sheetsList))
+        val tv = findViewById<AppCompatTextView>(R.id.text)
 
 
         val itemTouchHelper = ItemTouchHelper(object :
@@ -112,8 +131,14 @@ class MainActivity : AppCompatActivity() {
                 if (direction == ItemTouchHelper.LEFT) {
 
 
-                    Toast.makeText(this@MainActivity, "${sheetsList[sheetsList.size-1]}", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        this@MainActivity,
+                        "${sheetsList[sheetsList.size - 1]}",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
+                    tv.text = sheetsList.toString()
+
                 }
             }
 
@@ -123,7 +148,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun loadSheets(){
+    private fun loadSheets() {
         val transport = AndroidHttp.newCompatibleTransport()
         val factory = JacksonFactory.getDefaultInstance()
         val sheetsService = Sheets.Builder(transport, factory, null)
@@ -156,6 +181,14 @@ class MainActivity : AppCompatActivity() {
             }
 
         }.start()
+    }
+
+    fun createList(
+        sheetsList: MutableList<MutableList<WordsItem>>
+    ): MutableList<MutableList<WordsItem>> {
+        val list: MutableList<MutableList<WordsItem>>
+        list = sheetsList
+        return list
     }
 
 }
