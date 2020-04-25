@@ -21,11 +21,12 @@ import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
-    val KEY = "-OqJQcgnM"
+    val KEY = ""  //fixme
     val LINK =
         "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
 
-    private var sheetsList = mutableListOf(mutableListOf(WordsItem("", "")))
+        private var sheetsList: MutableList<MutableList<WordsItem>> =
+        mutableListOf(mutableListOf(WordsItem("1", "1")))
     private val wordsList: MutableList<WordsItem> =
         mutableListOf(
             WordsItem("Кто", "O que"),
@@ -80,15 +81,19 @@ class MainActivity : AppCompatActivity() {
             WordsItem("Откуда", "De onde")
         )
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        loadSheets()
+
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
 
         val rv = findViewById<RecyclerView>(R.id.rv_words)
         val linearLayoutManager = LinearLayoutManager(this)
         rv.layoutManager = linearLayoutManager
-        rv.adapter = WordsItemAdapter(wordsList)
+        rv.adapter = WordsItemAdapter(sheetsList)
 
 
         val itemTouchHelper = ItemTouchHelper(object :
@@ -105,10 +110,9 @@ class MainActivity : AppCompatActivity() {
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
 
                 if (direction == ItemTouchHelper.LEFT) {
-                    loadSheets()
 
 
-                    Toast.makeText(parent.baseContext, "${sheetsList.size}", Toast.LENGTH_SHORT)
+                    Toast.makeText(this@MainActivity, "${sheetsList[sheetsList.size-1]}", Toast.LENGTH_SHORT)
                         .show()
                 }
             }
@@ -119,7 +123,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun loadSheets() {
+    private fun loadSheets(){
         val transport = AndroidHttp.newCompatibleTransport()
         val factory = JacksonFactory.getDefaultInstance()
         val sheetsService = Sheets.Builder(transport, factory, null)
@@ -128,8 +132,9 @@ class MainActivity : AppCompatActivity() {
 
         val spreadSheetsId = "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
 
+
         Thread {
-            Runnable {
+            kotlin.run {
                 try {
                     val range = "Sheet1!C1:D50"
                     val result =
@@ -138,17 +143,20 @@ class MainActivity : AppCompatActivity() {
                             .execute()
 
                     val numRows = result.getValues().size
-                    Log.d("SUCCESS.", "rows retrived " + numRows);
+                    Log.i("SUCCESSGOOD", "rows retrived " + numRows);
 
-//                    sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
+//                    int = numRows
+                    sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
 
                 } catch (e: Exception) {
-                    //                        Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
+                    Log.d("FALSE.", "rows retrived ");
+//                                            Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
                 }
 
             }
 
         }.start()
-
     }
+
 }
+
