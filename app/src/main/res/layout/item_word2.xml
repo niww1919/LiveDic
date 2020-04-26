@@ -9,17 +9,6 @@
 
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_word1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_marginEnd="10dp"
-        android:gravity="end"
-        android:text="Слово"
-        android:textSize="20sp" />
-
-
-    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_word2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -28,7 +17,20 @@
         android:gravity="end"
         android:text="Word"
         android:textSize="20sp"
-        android:visibility="invisible" />
+         />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_word1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="end"
+        android:text="Слово"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        />
+
 
 </LinearLayout>
 

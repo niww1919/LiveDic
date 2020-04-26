@@ -1,36 +1,62 @@
 package com.my.livedic
 
+import android.app.Activity
+import android.media.audiofx.DynamicsProcessing
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Config
+import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.api.client.extensions.android.http.AndroidHttp
+import com.google.api.client.http.HttpTransport
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.services.sheets.v4.Sheets
+import com.google.api.services.sheets.v4.model.Sheet
+import com.google.api.services.sheets.v4.model.ValueRange
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
-    val wordsList: MutableList<WordsItem> =
+
+    val KEY = "-woZztYWrc"  //fixme
+    val LINK =
+        "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
+    var resource1 = R.layout.item_word
+    var resource2 = R.layout.item_word2
+    var resource = R.layout.item_word
+    var res: Int = 0
+
+
+    private var sheetsList: MutableList<MutableList<WordsItem>> =
+        mutableListOf(mutableListOf(WordsItem("1", "1")))
+    private val wordsList: MutableList<WordsItem> =
         mutableListOf(
             WordsItem("Кто", "O que"),
             WordsItem("Что", "Quem"),
-            WordsItem("Где", "Onde"),
-            WordsItem("Когда", "Quando"),
-            WordsItem("Сколько", "Quanto"),
-            WordsItem("Как", "Como"),
-            WordsItem("Почему", "Porque"),
-            WordsItem("какой", "qual"),
-            WordsItem("Я являюсь", "Eu sou")
+            WordsItem("Где", "Onde")
         )
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        loadSheets()
+//        loadHandler()
+
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
+
 
         val rv = findViewById<RecyclerView>(R.id.rv_words)
         val linearLayoutManager = LinearLayoutManager(this)
-        rv.layoutManager = linearLayoutManager
-        rv.adapter = WordsItemAdapter(wordsList)
-
 
 
         val itemTouchHelper = ItemTouchHelper(object :
@@ -44,16 +70,94 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+
+                if (direction == ItemTouchHelper.LEFT) {
+
                     (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-//                if (direction == ItemTouchHelper.LEFT) {
-//                    viewHolder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility =
-//                        View.VISIBLE
-//                }
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        "${resource1}",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+
+                }
+                if (direction == ItemTouchHelper.RIGHT) {
+
+                    Handler(Looper.getMainLooper()).post(Runnable {
+                        res = resource2
+                        rv.adapter = WordsItemAdapter(sheetsList, resource2)
+                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                    })
+                    if (res == resource2) {
+                        Handler(Looper.getMainLooper()).post(Runnable {
+                            res = resource1
+                            rv.adapter = WordsItemAdapter(sheetsList, resource1)
+                            (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                        })
+
+                    }
+
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        "${resource2}",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+
+
+                }
             }
 
         })
-        itemTouchHelper.attachToRecyclerView(rv)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable {
+
+
+            rv.layoutManager = linearLayoutManager
+            rv.adapter = WordsItemAdapter(sheetsList, resource)
+            itemTouchHelper.attachToRecyclerView(rv)
+        }, 2000)
 
 
     }
+
+    private fun loadSheets() {
+        val transport = AndroidHttp.newCompatibleTransport()
+        val factory = JacksonFactory.getDefaultInstance()
+        val sheetsService = Sheets.Builder(transport, factory, null)
+            .setApplicationName("LiveDic")
+            .build()
+
+        val spreadSheetsId = "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
+
+
+        Thread {
+            run {
+                try {
+                    val range = "Sheet1!C1:D139"//fixme change table range
+                    val result =
+                        sheetsService.spreadsheets().values().get(spreadSheetsId, range)
+                            .setKey(KEY)
+                            .execute()
+
+                    val numRows = result.getValues().size
+                    Log.i("SUCCESSGOOD", "rows retrived " + numRows);
+
+//                    int = numRows
+                    sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
+
+                } catch (e: Exception) {
+                    Log.d("FALSE.", "rows retrived ");
+//                                            Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
+                }
+
+            }
+
+        }.start()
+    }
+
+
 }
+
