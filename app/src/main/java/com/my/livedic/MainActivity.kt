@@ -9,9 +9,11 @@ import android.os.Looper
 import android.util.Config
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +30,10 @@ class MainActivity : AppCompatActivity() {
     val KEY = "-woZztYWrc"  //fixme
     val LINK =
         "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
+    var resource1= R.layout.item_word
+    var resource2= R.layout.item_word2
+    var resource= R.layout.item_word
+
 
     private var sheetsList: MutableList<MutableList<WordsItem>> =
         mutableListOf(mutableListOf(WordsItem("1", "1")))
@@ -52,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
 
 
+
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -66,21 +73,44 @@ class MainActivity : AppCompatActivity() {
 
                 if (direction == ItemTouchHelper.LEFT) {
 
-                    (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                    Handler(Looper.getMainLooper()).post {
+
+                        rv.adapter = WordsItemAdapter(sheetsList,resource1)
+
+                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                    }
 
                     Toast.makeText(
                         this@MainActivity,
-                        "${sheetsList[sheetsList.size - 1]}",
+                        "${resource1}",
                         Toast.LENGTH_SHORT
                     )
                         .show()
+
+                }
+                if (direction == ItemTouchHelper.RIGHT) {
+                    Handler(Looper.getMainLooper()).post(Runnable {
+                        rv.adapter = WordsItemAdapter(sheetsList,R.layout.item_word2)
+                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+
+                    })
+                    Toast.makeText(
+                        this@MainActivity,
+                        "${resource2}",
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+
+
                 }
             }
 
         })
         Handler(Looper.getMainLooper()).postDelayed(Runnable {
+
+
             rv.layoutManager = linearLayoutManager
-            rv.adapter = WordsItemAdapter(sheetsList)
+            rv.adapter = WordsItemAdapter(sheetsList,resource)
             itemTouchHelper.attachToRecyclerView(rv)
         }, 2000)
 
@@ -100,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         Thread {
             run {
                 try {
-                    val range = "Sheet1!C1:D89"
+                    val range = "Sheet1!C1:D139"//fixme change table range
                     val result =
                         sheetsService.spreadsheets().values().get(spreadSheetsId, range)
                             .setKey(KEY)
@@ -120,38 +150,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }.start()
-    }
-
-    private fun loadHandler() {
-        val transport = AndroidHttp.newCompatibleTransport()
-        val factory = JacksonFactory.getDefaultInstance()
-        val sheetsService = Sheets.Builder(transport, factory, null)
-            .setApplicationName("LiveDic")
-            .build()
-
-        val spreadSheetsId = "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
-
-        Handler(Looper.getMainLooper()).post {
-            try {
-                val range = "Sheet1!C1:D50"
-                val result =
-                    sheetsService.spreadsheets().values().get(spreadSheetsId, range)
-                        .setKey(KEY)
-                        .execute()
-
-                val numRows = result.getValues().size
-                Log.i("SUCCESSGOOD", "rows retrived " + numRows);
-
-//                    int = numRows
-                sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
-
-            } catch (e: Exception) {
-                Log.d("FALSE.", "rows retrived ");
-//                                            Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
-            }
-
-        }
-
     }
 
 

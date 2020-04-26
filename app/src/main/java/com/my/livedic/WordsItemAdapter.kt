@@ -8,10 +8,10 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import java.util.zip.Inflater
 
-class WordsItemAdapter(val data: MutableList<MutableList<WordsItem>>) : RecyclerView.Adapter<WordsViewHolder>() {
+class WordsItemAdapter(val data: MutableList<MutableList<WordsItem>>,val resourse:Int) : RecyclerView.Adapter<WordsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordsViewHolder {
         return WordsViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_word, parent, false)
+            LayoutInflater.from(parent.context).inflate(resourse, parent, false)
         )
     }
 
