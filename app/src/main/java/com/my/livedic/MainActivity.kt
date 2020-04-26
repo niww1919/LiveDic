@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +35,8 @@ class MainActivity : AppCompatActivity() {
     var resource2 = R.layout.item_word2
     var resource = R.layout.item_word
     var res: Int = 0
+    var size = 0
+
 
 
     private var sheetsList: MutableList<MutableList<WordsItem>> =
@@ -62,6 +65,13 @@ class MainActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView>(R.id.rv_words)
         val linearLayoutManager = LinearLayoutManager(this)
 
+        findViewById<AppCompatTextView>(R.id.tv_fragment_word1).setOnClickListener {
+            (it as AppCompatTextView).text = sheetsList1[size][0]
+            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).text = sheetsList2[size][0]
+            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).visibility = View.VISIBLE
+            size--
+
+        }
 
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -75,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                if (direction == ItemTouchHelper.LEFT) {
+                if (direction == ItemTouchHelper.RIGHT) {
 
                     (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
 
@@ -87,17 +97,17 @@ class MainActivity : AppCompatActivity() {
                         .show()
 
                 }
-                if (direction == ItemTouchHelper.RIGHT) {
+                if (direction == ItemTouchHelper.LEFT) {
 
                     Handler(Looper.getMainLooper()).post(Runnable {
                         res = resource2
-                        rv.adapter = WordsItemAdapter(sheetsList1,sheetsList2, resource2)
+                        rv.adapter = WordsItemAdapter(sheetsList1, sheetsList2, resource2)
                         (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
                     })
                     if (res == resource2) {
                         Handler(Looper.getMainLooper()).post(Runnable {
                             res = resource1
-                            rv.adapter = WordsItemAdapter(sheetsList1,sheetsList2, resource1)
+                            rv.adapter = WordsItemAdapter(sheetsList1, sheetsList2, resource1)
                             (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
                         })
 
@@ -111,7 +121,6 @@ class MainActivity : AppCompatActivity() {
                     )
                         .show()
 
-
                 }
             }
 
@@ -120,7 +129,7 @@ class MainActivity : AppCompatActivity() {
 
 
             rv.layoutManager = linearLayoutManager
-            rv.adapter = WordsItemAdapter(sheetsList1,sheetsList2, resource)
+            rv.adapter = WordsItemAdapter(sheetsList1, sheetsList2, resource)
             itemTouchHelper.attachToRecyclerView(rv)
         }, 2000)
 
@@ -163,6 +172,7 @@ class MainActivity : AppCompatActivity() {
                     sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
                     sheetsList1 = result1.getValues() as MutableList<MutableList<String>>
                     sheetsList2 = result2.getValues() as MutableList<MutableList<String>>
+                    size = sheetsList1.size -1
 
                 } catch (e: Exception) {
                     Log.d("FALSE.", "rows retrived ");
@@ -175,5 +185,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+}
+
+private operator fun Int.iterator(): Iterator<Int> {
+    TODO("Not yet implemented")
 }
 
