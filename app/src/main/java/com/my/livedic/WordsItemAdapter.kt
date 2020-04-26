@@ -8,7 +8,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import java.util.zip.Inflater
 
-class WordsItemAdapter(val data: MutableList<MutableList<WordsItem>>,val resourse:Int) : RecyclerView.Adapter<WordsViewHolder>() {
+class WordsItemAdapter(val data: MutableList<MutableList<String>>,val data2: MutableList<MutableList<String>>,val resourse:Int) : RecyclerView.Adapter<WordsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordsViewHolder {
         return WordsViewHolder(
             LayoutInflater.from(parent.context).inflate(resourse, parent, false)
@@ -26,7 +26,7 @@ class WordsItemAdapter(val data: MutableList<MutableList<WordsItem>>,val resours
 //        holder.itemView.setOnClickListener {
 //            holder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
 //        }
-        return holder.bind(data[position], position)
+        return holder.bind(data[position],data2[position], position)
 
     }
 }

@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
 
     private var sheetsList: MutableList<MutableList<WordsItem>> =
         mutableListOf(mutableListOf(WordsItem("1", "1")))
+    private var sheetsList1: MutableList<MutableList<String>> =
+        mutableListOf(mutableListOf(""))
+    private var sheetsList2: MutableList<MutableList<String>> =
+        mutableListOf(mutableListOf(""))
     private val wordsList: MutableList<WordsItem> =
         mutableListOf(
             WordsItem("Кто", "O que"),
@@ -87,13 +91,13 @@ class MainActivity : AppCompatActivity() {
 
                     Handler(Looper.getMainLooper()).post(Runnable {
                         res = resource2
-                        rv.adapter = WordsItemAdapter(sheetsList, resource2)
+                        rv.adapter = WordsItemAdapter(sheetsList1,sheetsList2, resource2)
                         (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
                     })
                     if (res == resource2) {
                         Handler(Looper.getMainLooper()).post(Runnable {
                             res = resource1
-                            rv.adapter = WordsItemAdapter(sheetsList, resource1)
+                            rv.adapter = WordsItemAdapter(sheetsList1,sheetsList2, resource1)
                             (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
                         })
 
@@ -116,7 +120,7 @@ class MainActivity : AppCompatActivity() {
 
 
             rv.layoutManager = linearLayoutManager
-            rv.adapter = WordsItemAdapter(sheetsList, resource)
+            rv.adapter = WordsItemAdapter(sheetsList1,sheetsList2, resource)
             itemTouchHelper.attachToRecyclerView(rv)
         }, 2000)
 
@@ -137,8 +141,18 @@ class MainActivity : AppCompatActivity() {
             run {
                 try {
                     val range = "Sheet1!C1:D139"//fixme change table range
+                    val range1 = "Sheet1!C1:C139"//fixme change table range
+                    val range2 = "Sheet1!D1:D139"//fixme change table range
                     val result =
                         sheetsService.spreadsheets().values().get(spreadSheetsId, range)
+                            .setKey(KEY)
+                            .execute()
+                    val result1 =
+                        sheetsService.spreadsheets().values().get(spreadSheetsId, range1)
+                            .setKey(KEY)
+                            .execute()
+                    val result2 =
+                        sheetsService.spreadsheets().values().get(spreadSheetsId, range2)
                             .setKey(KEY)
                             .execute()
 
@@ -147,6 +161,8 @@ class MainActivity : AppCompatActivity() {
 
 //                    int = numRows
                     sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
+                    sheetsList1 = result1.getValues() as MutableList<MutableList<String>>
+                    sheetsList2 = result2.getValues() as MutableList<MutableList<String>>
 
                 } catch (e: Exception) {
                     Log.d("FALSE.", "rows retrived ");
