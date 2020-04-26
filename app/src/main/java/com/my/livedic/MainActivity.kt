@@ -30,9 +30,10 @@ class MainActivity : AppCompatActivity() {
     val KEY = "-woZztYWrc"  //fixme
     val LINK =
         "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
-    var resource1= R.layout.item_word
-    var resource2= R.layout.item_word2
-    var resource= R.layout.item_word
+    var resource1 = R.layout.item_word
+    var resource2 = R.layout.item_word2
+    var resource = R.layout.item_word
+    var res: Int = 0
 
 
     private var sheetsList: MutableList<MutableList<WordsItem>> =
@@ -58,7 +59,6 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
 
 
-
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -73,12 +73,7 @@ class MainActivity : AppCompatActivity() {
 
                 if (direction == ItemTouchHelper.LEFT) {
 
-                    Handler(Looper.getMainLooper()).post {
-
-                        rv.adapter = WordsItemAdapter(sheetsList,resource1)
-
-                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-                    }
+                    (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
 
                     Toast.makeText(
                         this@MainActivity,
@@ -89,11 +84,22 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 if (direction == ItemTouchHelper.RIGHT) {
-                    Handler(Looper.getMainLooper()).post(Runnable {
-                        rv.adapter = WordsItemAdapter(sheetsList,R.layout.item_word2)
-                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
 
+                    Handler(Looper.getMainLooper()).post(Runnable {
+                        res = resource2
+                        rv.adapter = WordsItemAdapter(sheetsList, resource2)
+                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
                     })
+                    if (res == resource2) {
+                        Handler(Looper.getMainLooper()).post(Runnable {
+                            res = resource1
+                            rv.adapter = WordsItemAdapter(sheetsList, resource1)
+                            (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                        })
+
+                    }
+
+
                     Toast.makeText(
                         this@MainActivity,
                         "${resource2}",
@@ -110,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
 
             rv.layoutManager = linearLayoutManager
-            rv.adapter = WordsItemAdapter(sheetsList,resource)
+            rv.adapter = WordsItemAdapter(sheetsList, resource)
             itemTouchHelper.attachToRecyclerView(rv)
         }, 2000)
 
