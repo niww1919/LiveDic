@@ -10,6 +10,7 @@ import android.util.Config
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         Thread {
             run {
                 try {
-                    val range = "Sheet1!C1:D50"
+                    val range = "Sheet1!C1:D89"
                     val result =
                         sheetsService.spreadsheets().values().get(spreadSheetsId, range)
                             .setKey(KEY)
