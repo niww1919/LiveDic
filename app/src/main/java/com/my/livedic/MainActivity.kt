@@ -1,42 +1,45 @@
 package com.my.livedic
 
 import android.app.Activity
-import android.media.audiofx.DynamicsProcessing
+import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Config
 import android.util.Log
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import com.google.api.client.extensions.android.http.AndroidHttp
-import com.google.api.client.http.HttpTransport
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.sheets.v4.Sheets
-import com.google.api.services.sheets.v4.model.Sheet
-import com.google.api.services.sheets.v4.model.ValueRange
+import com.google.api.services.sheets.v4.SheetsScopes
+import com.google.api.services.sheets.v4.model.Spreadsheet
+import com.google.api.services.sheets.v4.model.SpreadsheetProperties
 import java.lang.Exception
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val REQUEST_SIGN_IN = 1
+    }
 
     val KEY = "-woZztYWrc"  //fixme
     val LINK =
-        "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
+        "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
     var resource1 = R.layout.item_word
     var resource2 = R.layout.item_word2
     var resource = R.layout.item_word
     var res: Int = 0
     var size = 0
-
 
 
     private var sheetsList: MutableList<MutableList<WordsItem>> =
@@ -59,6 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
 
+        requestSignIn(applicationContext)
         setContentView(R.layout.activity_main)
 
 
@@ -66,10 +70,22 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
 
         findViewById<AppCompatTextView>(R.id.tv_fragment_word1).setOnClickListener {
-            (it as AppCompatTextView).text = sheetsList1[size][0]
-            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).text = sheetsList2[size][0]
-            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).visibility = View.VISIBLE
+            var id = Random.nextInt(sheetsList1.size-1)
+            (it as AppCompatTextView).text = sheetsList1[id][0]
+            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2)).text = sheetsList2[id][0]
+            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2)).visibility =
+                View.INVISIBLE
+
+            Handler().postDelayed({
+                (findViewById<AppCompatTextView>(R.id.tv_fragment_word2)).visibility = View.VISIBLE
+            }, 2000)
+
             size--
+
+        }
+        findViewById<AppCompatTextView>(R.id.tv_fragment_word1).setOnLongClickListener {
+            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2)).visibility = View.VISIBLE
+            return@setOnLongClickListener true
 
         }
 
@@ -136,6 +152,65 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val range = "Sheet1!C1:D139"//fixme change table range
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_SIGN_IN) {
+            if (resultCode == Activity.RESULT_OK) {
+                GoogleSignIn.getSignedInAccountFromIntent(data)
+                    .addOnSuccessListener {
+                        val scopes = listOf(SheetsScopes.SPREADSHEETS)
+                        val credential = GoogleAccountCredential.usingOAuth2(applicationContext,scopes)
+                        credential.selectedAccount = it.account
+                        val jsonFactory =  JacksonFactory.getDefaultInstance()
+                        val httpTransport =  AndroidHttp.newCompatibleTransport()
+
+//                        val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
+                        val service = Sheets.Builder(httpTransport,jsonFactory,credential)
+                            .setApplicationName(getString(R.string.app_name))
+//                            .setApplicationName("Dic")
+                            .build()
+
+                        createSpreadsheet(service)
+                    }
+                    .addOnFailureListener { e ->
+                        Log.d("Sheets", e.toString())
+                    }
+            }
+        }
+
+    }
+
+    private fun createSpreadsheet(service: Sheets?) {
+        var spreadsheet = Spreadsheet()
+            .setProperties(
+                SpreadsheetProperties()
+                    .setTitle("CreateNewSpreadsheet")
+            )
+
+        Handler(Looper.getMainLooper()).post{
+            spreadsheet = service!!.spreadsheets().create(spreadsheet).execute()
+        }
+
+    }
+
+    private fun requestSignIn(context: Context) {
+        /*
+        GoogleSignIn.getLastSignedInAccount(context)?.also { account ->
+            Timber.d("account=${account.displayName}")
+        }
+         */
+
+        val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            // .requestEmail()
+             .requestScopes(Scope(SheetsScopes.SPREADSHEETS_READONLY))//fixme import Scope
+//            .requestScopes(Scope(SheetsScopes.SPREADSHEETS))
+            .build()
+        val client = GoogleSignIn.getClient(context, signInOptions)
+
+        startActivityForResult(client.signInIntent, REQUEST_SIGN_IN)
+    }
+
     private fun loadSheets() {
         val transport = AndroidHttp.newCompatibleTransport()
         val factory = JacksonFactory.getDefaultInstance()
@@ -172,7 +247,7 @@ class MainActivity : AppCompatActivity() {
                     sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
                     sheetsList1 = result1.getValues() as MutableList<MutableList<String>>
                     sheetsList2 = result2.getValues() as MutableList<MutableList<String>>
-                    size = sheetsList1.size -1
+                    size = sheetsList1.size - 1
 
                 } catch (e: Exception) {
                     Log.d("FALSE.", "rows retrived ");
@@ -182,12 +257,13 @@ class MainActivity : AppCompatActivity() {
             }
 
         }.start()
+
+
     }
 
 
+
+
 }
 
-private operator fun Int.iterator(): Iterator<Int> {
-    TODO("Not yet implemented")
-}
 

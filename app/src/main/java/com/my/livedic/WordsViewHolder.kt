@@ -12,6 +12,7 @@ class WordsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         itemView.findViewById<AppCompatTextView>(R.id.tv_word1).text =data[0]
         itemView.findViewById<AppCompatTextView>(R.id.tv_word2).text =data2[0]
 
+
         itemView.setOnClickListener {
             Log.d("Position.", "Position + $pos");
             Log.d("Position.", "Position + $data");
