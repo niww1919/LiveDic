@@ -68,8 +68,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<AppCompatTextView>(R.id.tv_fragment_word1).setOnClickListener {
             (it as AppCompatTextView).text = sheetsList1[size][0]
             (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).text = sheetsList2[size][0]
-            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).visibility = View.VISIBLE
+            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).visibility = View.INVISIBLE
             size--
+            Handler().postDelayed({
+                (findViewById<AppCompatTextView>(R.id.tv_fragment_word2)).visibility = View.VISIBLE
+            }, 2000)
+
 
         }
 
