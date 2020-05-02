@@ -22,11 +22,12 @@ class WordsItemAdapter(val data: MutableList<MutableList<String>>,val data2: Mut
     override fun onBindViewHolder(holder: WordsViewHolder, position: Int) {
 
 
+
         //todo show word 2
 //        holder.itemView.setOnClickListener {
 //            holder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
 //        }
-        return holder.bind(data[position],data2[position], position)
+        return holder.bind(data[position],data2[position], holder.adapterPosition)
 
     }
 }
