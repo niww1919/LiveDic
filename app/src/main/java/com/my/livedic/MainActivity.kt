@@ -55,19 +55,6 @@ class MainActivity : AppCompatActivity() {
         val linearLayoutManager = LinearLayoutManager(this)
 
 
-
-
-//        findViewById<AppCompatTextView>(R.id.tv_fragment_word1).setOnClickListener {
-//            (it as AppCompatTextView).text = sheetsList1[size][0]
-//            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2)).text = sheetsList2[size][0]
-//            (findViewById<AppCompatTextView>(R.id.tv_fragment_word2) as AppCompatTextView).visibility =
-//                View.INVISIBLE
-//            if (size > 0) size--
-//            Handler().postDelayed({
-//                (findViewById<AppCompatTextView>(R.id.tv_fragment_word2)).visibility = View.VISIBLE
-//            }, 2000)
-//        }
-
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
             override fun onMove(
@@ -107,13 +94,17 @@ class MainActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
                 rv.adapter = WordsItemAdapter(sheetsList2, sheetsList1, layoutRes)
+                rv.smoothScrollToPosition(sheetsList1.size-1)
+
                 itemTouchHelper.attachToRecyclerView(rv)
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })
         }
         findViewById<Chip>(R.id.chip3).setOnClickListener {
             Handler(Looper.getMainLooper()).post(Runnable {
-                rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+                val llm =LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+                rv.layoutManager = llm
+
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })
         }
@@ -160,7 +151,6 @@ class MainActivity : AppCompatActivity() {
 
                 } catch (e: Exception) {
                     Log.d("FALSE.", "rows retrived ");
-//                                            Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
                 }
 
             }

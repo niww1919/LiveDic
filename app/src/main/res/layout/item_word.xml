@@ -5,17 +5,26 @@
     android:id="@+id/ll"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="6dp"
     android:layout_margin="5dp"
+    app:cardCornerRadius="6dp"
     app:cardElevation="6dp">
 
+<!--    <com.google.android.material.chip.Chip-->
+
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="end|top"-->
+<!--        android:textSize="15sp"-->
+<!--        app:chipIcon="@drawable/ic_star_border_black_24dp" />-->
+
+
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_gravity="center"
-        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
         android:orientation="vertical">
 
 
