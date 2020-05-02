@@ -22,8 +22,6 @@ class MainActivity : AppCompatActivity() {
     val KEY = "-woZztYWrc"  //fixme
     val LINK =
         "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
-    var resource1 = R.layout.item_word
-    var resource2 = R.layout.item_word2
     var layoutRes = R.layout.item_word
     var res: Int = 0
     var size = 0
@@ -110,6 +108,12 @@ class MainActivity : AppCompatActivity() {
                 rv.layoutManager = linearLayoutManager
                 rv.adapter = WordsItemAdapter(sheetsList2, sheetsList1, layoutRes)
                 itemTouchHelper.attachToRecyclerView(rv)
+                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+            })
+        }
+        findViewById<Chip>(R.id.chip3).setOnClickListener {
+            Handler(Looper.getMainLooper()).post(Runnable {
+                rv.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })
         }
