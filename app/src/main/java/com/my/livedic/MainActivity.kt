@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
                 rv.adapter = WordsItemAdapter(sheetsList2, sheetsList1, layoutRes)
-                rv.smoothScrollToPosition(sheetsList1.size-1)
 
                 itemTouchHelper.attachToRecyclerView(rv)
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
@@ -104,6 +103,7 @@ class MainActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).post(Runnable {
                 val llm =LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
                 rv.layoutManager = llm
+
 
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })

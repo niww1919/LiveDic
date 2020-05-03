@@ -22,8 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
+        android:layout_margin="10dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -46,9 +45,9 @@
             android:layout_margin="5dp"
             android:layout_marginStart="10dp"
             android:gravity="end"
-            android:text="Word"
             android:textSize="20sp"
-            android:visibility="invisible" />
+
+            />
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.cardview.widget.CardView>
 

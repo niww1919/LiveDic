@@ -13,6 +13,7 @@
 <!--        android:layout_height="wrap_content"-->
 <!--        app:layout_constraintTop_toTopOf="parent" />-->
 
+
     <com.google.android.material.chip.ChipGroup
 
         android:id="@+id/chip_group"
@@ -22,7 +23,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
         >
 
         <com.google.android.material.chip.Chip

@@ -7,22 +7,25 @@ import androidx.recyclerview.widget.RecyclerView
 
 class WordsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    fun bind(data: MutableList<String>,data2: MutableList<String>, pos: Int) {
-        val list = mutableListOf<String>()
+    fun bind(data: MutableList<String>) {
 
-        
+        val word1 = itemView.findViewById<AppCompatTextView>(R.id.tv_word1)
+        val word2 = itemView.findViewById<AppCompatTextView>(R.id.tv_word2)
 
-        itemView.findViewById<AppCompatTextView>(R.id.tv_word1).text =data[0]
-        itemView.findViewById<AppCompatTextView>(R.id.tv_word2).text =data2[0]
+        word1.text = data[0]
+        if (data.size > 1) {
+            Log.d("Size", "Position + ${data.size}");
 
-        itemView.setOnClickListener {
-            Log.d("Position.", "Position + $pos");
-            Log.d("Position.", "Position + $data");
-
-            if (itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility == View.INVISIBLE) {
-                itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
-            }
+            word2.text = data[1]
         }
+
+//        itemView.setOnClickListener {
+//            Log.d("Position.", "Position + $data");
+//
+////            if (word2.visibility == View.INVISIBLE) {
+////                word2.visibility = View.VISIBLE
+////            }
+//        }
 
 
     }
