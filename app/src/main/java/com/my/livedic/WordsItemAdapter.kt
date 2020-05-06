@@ -1,22 +1,18 @@
 package com.my.livedic
 
-import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
-import java.util.zip.Inflater
 
-class WordsItemAdapter(val data: MutableList<MutableList<String>>,val data2: MutableList<MutableList<String>>,val resourse:Int) : RecyclerView.Adapter<WordsViewHolder>() {
+class WordsItemAdapter(val data: MutableList<String>,val data2: MutableList<String>,val resoursesLayout:Int,val pos: Int) : RecyclerView.Adapter<WordsViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordsViewHolder {
         return WordsViewHolder(
-            LayoutInflater.from(parent.context).inflate(resourse, parent, false)
+            LayoutInflater.from(parent.context).inflate(resoursesLayout, parent, false)
         )
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return 1
     }
 
     override fun onBindViewHolder(holder: WordsViewHolder, position: Int) {
@@ -24,10 +20,11 @@ class WordsItemAdapter(val data: MutableList<MutableList<String>>,val data2: Mut
 
 
         //todo show word 2
-//        holder.itemView.setOnClickListener {
-//            holder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
+//        holder.itemView.setOnLongClickListener {
+//
+////            holder.itemView.findViewById<AppCompatTextView>(R.id.tv_word2).visibility = View.VISIBLE
 //        }
-        return holder.bind(data[position],data2[position], holder.adapterPosition)
+        return holder.bind(data,data2, pos)
 
     }
 }
