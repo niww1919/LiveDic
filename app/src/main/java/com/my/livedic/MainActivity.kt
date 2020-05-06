@@ -1,28 +1,18 @@
 package com.my.livedic
 
-import android.app.Activity
-import android.media.audiofx.DynamicsProcessing
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Config
 import android.util.Log
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.api.client.extensions.android.http.AndroidHttp
-import com.google.api.client.http.HttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.sheets.v4.Sheets
-import com.google.api.services.sheets.v4.model.Sheet
-import com.google.api.services.sheets.v4.model.ValueRange
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
@@ -30,20 +20,17 @@ class MainActivity : AppCompatActivity() {
     val KEY = "-woZztYWrc"  //fixme
     val LINK =
         "https://docs.google.com/spreadsheets/d/1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28/edit#gid=86818389"
-    var resource1 = R.layout.item_word
-    var resource2 = R.layout.item_word2
-    var resource = R.layout.item_word
+    var layoutRes = R.layout.item_word
     var res: Int = 0
+    var wordPosition = 0
 
 
     private var sheetsList: MutableList<MutableList<WordsItem>> =
-        mutableListOf(mutableListOf(WordsItem("1", "1")))
-    private val wordsList: MutableList<WordsItem> =
-        mutableListOf(
-            WordsItem("Кто", "O que"),
-            WordsItem("Что", "Quem"),
-            WordsItem("Где", "Onde")
-        )
+        mutableListOf(mutableListOf(WordsItem("", "", "", "")))
+    private var sheetsList1: MutableList<MutableList<String>> =
+        mutableListOf(mutableListOf(""))
+    private var sheetsList2: MutableList<MutableList<String>> =
+        mutableListOf(mutableListOf(""))
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,8 +43,24 @@ class MainActivity : AppCompatActivity() {
 
 
         val rv = findViewById<RecyclerView>(R.id.rv_words)
+//        val linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         val linearLayoutManager = LinearLayoutManager(this)
 
+
+        val chip1 = findViewById<Chip>(R.id.chip1)
+        val chip2 = findViewById<Chip>(R.id.chip2)
+        val chip3 = findViewById<Chip>(R.id.chip3)
+
+
+        val chipGroup = findViewById<ChipGroup>(R.id.chip_group)
+        val chip = Chip(this)
+        val listLang = sheetsList[0]
+        chip.text = "Good"
+        chipGroup.addView(chip)
+
+        /***
+         *
+         */
 
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -71,55 +74,76 @@ class MainActivity : AppCompatActivity() {
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                if (direction == ItemTouchHelper.LEFT) {
-
-                    (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-
-                    Toast.makeText(
-                        this@MainActivity,
-                        "${resource1}",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-
-                }
                 if (direction == ItemTouchHelper.RIGHT) {
-
-                    Handler(Looper.getMainLooper()).post(Runnable {
-                        res = resource2
-                        rv.adapter = WordsItemAdapter(sheetsList, resource2)
+                    if (chip2.isChecked) {
+                        rv.adapter =
+                            WordsItemAdapter(sheetsList2[wordPosition], sheetsList1[wordPosition], layoutRes, wordPosition)
+                        if (wordPosition > 1) {
+                            wordPosition++
+                        }
                         (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-                    })
-                    if (res == resource2) {
-                        Handler(Looper.getMainLooper()).post(Runnable {
-                            res = resource1
-                            rv.adapter = WordsItemAdapter(sheetsList, resource1)
-                            (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-                        })
-
+                    }
+                    else{
+                        rv.adapter =
+                            WordsItemAdapter(sheetsList1[wordPosition], sheetsList2[wordPosition], layoutRes, wordPosition)
+                        if (wordPosition > 1) {
+                            wordPosition++
+                        }
+                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
                     }
 
+                }
+                if (direction == ItemTouchHelper.LEFT) {
+                    if (chip2.isChecked) {
+                        rv.adapter =
+                            WordsItemAdapter(sheetsList2[wordPosition], sheetsList1[wordPosition], layoutRes,wordPosition)
+                        if (wordPosition > 1) {
+                            wordPosition--
+                        }
+                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
 
-                    Toast.makeText(
-                        this@MainActivity,
-                        "${resource2}",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-
+                    } else{
+                        rv.adapter =
+                            WordsItemAdapter(sheetsList1[wordPosition], sheetsList2[wordPosition], layoutRes,wordPosition)
+                        if (wordPosition > 1) {
+                            wordPosition--
+                        }
+                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                    }
 
                 }
             }
 
         })
-        Handler(Looper.getMainLooper()).postDelayed(Runnable {
 
+        itemTouchHelper.attachToRecyclerView(rv)
 
-            rv.layoutManager = linearLayoutManager
-            rv.adapter = WordsItemAdapter(sheetsList, resource)
-            itemTouchHelper.attachToRecyclerView(rv)
-        }, 2000)
+        chip1.setOnClickListener {
+            chip2.isChecked = false
+            Handler(Looper.getMainLooper()).post(Runnable {
+                rv.layoutManager = linearLayoutManager
+                rv.adapter = WordsItemAdapter(sheetsList1[wordPosition], sheetsList2[wordPosition], layoutRes,wordPosition)
+                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+            })
+        }
+        chip2.setOnClickListener {
+            chip1.isChecked = false
 
+            Handler(Looper.getMainLooper()).post(Runnable {
+                rv.layoutManager = linearLayoutManager
+                rv.adapter = WordsItemAdapter(sheetsList2[wordPosition], sheetsList1[wordPosition], layoutRes,wordPosition)
+
+                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+            })
+        }
+//        findViewById<Chip>(R.id.chip3).setOnClickListener {
+//            Handler(Looper.getMainLooper()).post(Runnable {
+//                val llm = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//                rv.layoutManager = llm
+//
+//                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+//            })
+//        }
 
     }
 
@@ -136,9 +160,19 @@ class MainActivity : AppCompatActivity() {
         Thread {
             run {
                 try {
-                    val range = "Sheet1!C1:D139"//fixme change table range
+                    val range = "Sheet1!A1:D296"//fixme change table range
+                    val range1 = "Sheet1!C1:C296"//fixme change table range
+                    val range2 = "Sheet1!D1:D296"//fixme change table range
                     val result =
                         sheetsService.spreadsheets().values().get(spreadSheetsId, range)
+                            .setKey(KEY)
+                            .execute()
+                    val result1 =
+                        sheetsService.spreadsheets().values().get(spreadSheetsId, range1)
+                            .setKey(KEY)
+                            .execute()
+                    val result2 =
+                        sheetsService.spreadsheets().values().get(spreadSheetsId, range2)
                             .setKey(KEY)
                             .execute()
 
@@ -146,11 +180,14 @@ class MainActivity : AppCompatActivity() {
                     Log.i("SUCCESSGOOD", "rows retrived " + numRows);
 
 //                    int = numRows
-                    sheetsList = result.getValues() as MutableList<MutableList<WordsItem>>
+                    sheetsList.addAll(result?.getValues() as MutableList<MutableList<WordsItem>>)
+//                    sheetsList = result?.getValues() as MutableList<MutableList<WordsItem>>
+                    sheetsList1 = result1?.getValues() as MutableList<MutableList<String>>
+                    sheetsList2 = result2?.getValues() as MutableList<MutableList<String>>
+                    wordPosition = sheetsList1.size - 1
 
                 } catch (e: Exception) {
                     Log.d("FALSE.", "rows retrived ");
-//                                            Toast.makeText(this,"$e",Toast.LENGTH_SHORT).show()
                 }
 
             }
@@ -159,5 +196,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+}
+
+private fun <E> MutableList<E>.addAll(elements: List<E>?) {
+    TODO("Not yet implemented")
+}
+
+private operator fun Int.iterator(): Iterator<Int> {
+    TODO("Not yet implemented")
 }
 
