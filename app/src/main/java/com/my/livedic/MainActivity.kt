@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         val chip1 = findViewById<Chip>(R.id.chip1)
         val chip2 = findViewById<Chip>(R.id.chip2)
+        val chip3 = findViewById<Chip>(R.id.chip3)
 
 
         val chipGroup = findViewById<ChipGroup>(R.id.chip_group)
@@ -57,6 +58,9 @@ class MainActivity : AppCompatActivity() {
         chip.text = "Good"
         chipGroup.addView(chip)
 
+        /***
+         *
+         */
 
         val itemTouchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -112,13 +116,13 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+        itemTouchHelper.attachToRecyclerView(rv)
 
         chip1.setOnClickListener {
             chip2.isChecked = false
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
                 rv.adapter = WordsItemAdapter(sheetsList1[wordPosition], sheetsList2[wordPosition], layoutRes,wordPosition)
-                itemTouchHelper.attachToRecyclerView(rv)
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })
         }
@@ -129,7 +133,6 @@ class MainActivity : AppCompatActivity() {
                 rv.layoutManager = linearLayoutManager
                 rv.adapter = WordsItemAdapter(sheetsList2[wordPosition], sheetsList1[wordPosition], layoutRes,wordPosition)
 
-                itemTouchHelper.attachToRecyclerView(rv)
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })
         }

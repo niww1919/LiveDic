@@ -15,8 +15,11 @@ class WordsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val progressBar = itemView.findViewById<ProgressBar>(R.id.progress_bar)
 
 
-        progressBar.max = 295
-        progressBar.progress = pos
+        var max = 295
+        if (pos >= max) max = pos
+
+        progressBar.max = max
+        progressBar.progress = max - pos
 
         word1.text =data[0].replaceFirst(
             data[0][0],
