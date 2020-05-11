@@ -1,4 +1,4 @@
 package com.my.livedic
 
-data class WordsItem(val lang1:String, val lang2:String, val word1: String, val word2: String) {
+data class WordsItem(var lang1:String, var lang2:String, var word1: String, var word2: String) {
 }

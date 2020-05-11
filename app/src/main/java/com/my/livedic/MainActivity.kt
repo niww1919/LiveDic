@@ -25,8 +25,10 @@ class MainActivity : AppCompatActivity() {
     var wordPosition = 0
 
 
-    private var sheetsList: MutableList<MutableList<WordsItem>> =
-        mutableListOf(mutableListOf(WordsItem("", "", "", "")))
+    private var sheetsList: MutableList<MutableList<String>> =
+        mutableListOf(mutableListOf("0", "1", "2", "3"))
+    private var listWordsItem = mutableListOf(WordsItem("", "", "", ""))
+    private var listOffersItem = mutableListOf(WordsItem("", "", "", ""))
     private var sheetsList1: MutableList<MutableList<String>> =
         mutableListOf(mutableListOf(""))
     private var sheetsList2: MutableList<MutableList<String>> =
@@ -77,15 +79,15 @@ class MainActivity : AppCompatActivity() {
                 if (direction == ItemTouchHelper.RIGHT) {
                     if (chip2.isChecked) {
                         rv.adapter =
-                            WordsItemAdapter(sheetsList2[wordPosition], sheetsList1[wordPosition], layoutRes, wordPosition)
-                        if (wordPosition > 1) {
+                            WordsItemAdapter(sheetsList[wordPosition][3], sheetsList[wordPosition][2], layoutRes, wordPosition)
+                        if (wordPosition <= sheetsList.size - 1 ) {
                             wordPosition++
                         }
                         (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
                     }
                     else{
                         rv.adapter =
-                            WordsItemAdapter(sheetsList1[wordPosition], sheetsList2[wordPosition], layoutRes, wordPosition)
+                            WordsItemAdapter(sheetsList[wordPosition][2], sheetsList[wordPosition][3], layoutRes, wordPosition)
                         if (wordPosition > 1) {
                             wordPosition++
                         }
@@ -96,7 +98,9 @@ class MainActivity : AppCompatActivity() {
                 if (direction == ItemTouchHelper.LEFT) {
                     if (chip2.isChecked) {
                         rv.adapter =
-                            WordsItemAdapter(sheetsList2[wordPosition], sheetsList1[wordPosition], layoutRes,wordPosition)
+                            WordsItemAdapter(sheetsList[wordPosition][3], sheetsList[wordPosition][2], layoutRes,wordPosition)
+                        Log.d("Sheetlist.", sheetsList[wordPosition][3].toString());
+
                         if (wordPosition > 1) {
                             wordPosition--
                         }
@@ -104,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
                     } else{
                         rv.adapter =
-                            WordsItemAdapter(sheetsList1[wordPosition], sheetsList2[wordPosition], layoutRes,wordPosition)
+                            WordsItemAdapter(sheetsList[wordPosition][2], sheetsList[wordPosition][3], layoutRes,wordPosition)
                         if (wordPosition > 1) {
                             wordPosition--
                         }
@@ -122,7 +126,7 @@ class MainActivity : AppCompatActivity() {
             chip2.isChecked = false
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
-                rv.adapter = WordsItemAdapter(sheetsList1[wordPosition], sheetsList2[wordPosition], layoutRes,wordPosition)
+                rv.adapter = WordsItemAdapter(sheetsList[wordPosition][2], sheetsList[wordPosition][3], layoutRes,wordPosition)
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })
         }
@@ -131,20 +135,11 @@ class MainActivity : AppCompatActivity() {
 
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
-                rv.adapter = WordsItemAdapter(sheetsList2[wordPosition], sheetsList1[wordPosition], layoutRes,wordPosition)
+                rv.adapter = WordsItemAdapter(sheetsList[wordPosition][3], sheetsList[wordPosition][2], layoutRes,wordPosition)
 
                 (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
             })
         }
-//        findViewById<Chip>(R.id.chip3).setOnClickListener {
-//            Handler(Looper.getMainLooper()).post(Runnable {
-//                val llm = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-//                rv.layoutManager = llm
-//
-//                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-//            })
-//        }
-
     }
 
     private fun loadSheets() {
@@ -180,11 +175,16 @@ class MainActivity : AppCompatActivity() {
                     Log.i("SUCCESSGOOD", "rows retrived " + numRows);
 
 //                    int = numRows
-                    sheetsList.addAll(result?.getValues() as MutableList<MutableList<WordsItem>>)
-//                    sheetsList = result?.getValues() as MutableList<MutableList<WordsItem>>
-                    sheetsList1 = result1?.getValues() as MutableList<MutableList<String>>
-                    sheetsList2 = result2?.getValues() as MutableList<MutableList<String>>
-                    wordPosition = sheetsList1.size - 1
+                    sheetsList.addAll(result?.getValues() as MutableList<MutableList<String>>)
+                    Log.d("SheetString", sheetsList[0].toString());
+                    Log.d("SheetString", sheetsList[1].size.toString());
+                    Log.d("SheetString", sheetsList[1][0]);
+                    Log.d("SheetString", sheetsList[1][1]);
+                    Log.d("SheetString", sheetsList[1][2]);
+                    Log.d("SheetString", sheetsList[1][3]);
+
+
+                    wordPosition = sheetsList.size - 1
 
                 } catch (e: Exception) {
                     Log.d("FALSE.", "rows retrived ");

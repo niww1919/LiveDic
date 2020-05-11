@@ -8,12 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 
 class WordsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    fun bind(data: MutableList<String>,data2: MutableList<String>, pos: Int) {
-        val list = mutableListOf<String>()
+    fun bind(data: String,data2: String, pos: Int) {
+
         val word1 = itemView.findViewById<AppCompatTextView>(R.id.tv_word1)
         val word2 = itemView.findViewById<AppCompatTextView>(R.id.tv_word2)
         val progressBar = itemView.findViewById<ProgressBar>(R.id.progress_bar)
-
 
         var max = 295
         if (pos >= max) max = pos
@@ -21,12 +20,17 @@ class WordsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         progressBar.max = max
         progressBar.progress = max - pos
 
-        word1.text =data[0].replaceFirst(
-            data[0][0],
-            data[0][0].toUpperCase())
-        word2.text =data2[0].replaceFirst(
-            data2[0][0],
-            data2[0][0].toUpperCase())
+//            word1.text = data
+//            word2.text = data2
+        word1.text = data.replaceFirst(
+                data[0],
+                data[0].toUpperCase()
+            )
+            word2.text = data2.replaceFirst(
+                data2[0],
+                data2[0].toUpperCase()
+            )
+
 
         itemView.setOnClickListener {
             Log.d("Position.", "Position + $pos");
