@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         val mSettings = getSharedPreferences(APP_COUNTS_WORDS, Context.MODE_PRIVATE)
         val editor = mSettings.edit()
 
-        loadSheets(mSettings.getInt(APP_COUNTS_WORDS,0))
+        loadSheets(mSettings.getInt(APP_COUNTS_WORDS, 0))
 
         super.onCreate(savedInstanceState)
 
@@ -77,34 +77,19 @@ class MainActivity : AppCompatActivity() {
                 if (direction == ItemTouchHelper.RIGHT) {
 
                     if (chip2.isChecked) {
-                        rv.adapter =
-                            WordsItemAdapter(
-                                sheetsList[wordPosition][3],
-                                sheetsList[wordPosition][2],
-                                layoutRes,
-                                wordPosition
-                            )
-                        if (wordPosition <= sheetsList.size - 1) {
-                            wordPosition++
-                        }
-                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                        addAdapter(rv, sheetsList[wordPosition][3], sheetsList[wordPosition][2])
                     } else {
-                        rv.adapter =
-                            WordsItemAdapter(
-                                sheetsList[wordPosition][2],
-                                sheetsList[wordPosition][3],
-                                layoutRes,
-                                wordPosition
-                            )
-                        if (wordPosition > 1) {
-                            wordPosition++
-                        }
-                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                        addAdapter(rv, sheetsList[wordPosition][2], sheetsList[wordPosition][3])
                     }
 
+                    if (wordPosition > 1) {
+                        wordPosition++
+                        Log.d("wordPosition.", wordPosition.toString() + sheetsList[wordPosition][2]);
+
+                    }
                 }
                 if (direction == ItemTouchHelper.LEFT) {
-                    //fixme
+
                     if (chip3.isChecked) {
                         while (sheetsList[wordPosition][2].contains(
                                 " ",
@@ -125,35 +110,14 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-
-
                     if (chip2.isChecked) {
-                        rv.adapter =
-                            WordsItemAdapter(
-                                sheetsList[wordPosition][3],
-                                sheetsList[wordPosition][2],
-                                layoutRes,
-                                wordPosition
-                            )
-                        Log.d("Sheetlist.", sheetsList[wordPosition][3].toString());
-
-                        if (wordPosition > 1) {
-                            wordPosition--
-                        }
-                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
-
+                        addAdapter(rv, sheetsList[wordPosition][3], sheetsList[wordPosition][2])
                     } else {
-                        rv.adapter =
-                            WordsItemAdapter(
-                                sheetsList[wordPosition][2],
-                                sheetsList[wordPosition][3],
-                                layoutRes,
-                                wordPosition
-                            )
-                        if (wordPosition > 1) {
-                            wordPosition--
-                        }
-                        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                        addAdapter(rv, sheetsList[wordPosition][2], sheetsList[wordPosition][3])
+                    }
+                    if (wordPosition > 1) {
+                        wordPosition--
+                        Log.d("wordPosition.", wordPosition.toString() + sheetsList[wordPosition][2]);
                     }
 
                 }
@@ -170,13 +134,7 @@ class MainActivity : AppCompatActivity() {
             chip2.isChecked = false
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
-                rv.adapter = WordsItemAdapter(
-                    sheetsList[wordPosition][2],
-                    sheetsList[wordPosition][3],
-                    layoutRes,
-                    wordPosition
-                )
-                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                addAdapter(rv,sheetsList[wordPosition][2],sheetsList[wordPosition][3])
             })
         }
         chip2.setOnClickListener {
@@ -184,19 +142,23 @@ class MainActivity : AppCompatActivity() {
 
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
-                rv.adapter = WordsItemAdapter(
-                    sheetsList[wordPosition][3],
-                    sheetsList[wordPosition][2],
-                    layoutRes,
-                    wordPosition
-                )
-
-                (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+                addAdapter(rv,sheetsList[wordPosition][3],sheetsList[wordPosition][2])
             })
         }
     }
 
-    private fun loadSheets(pos : Int) {
+    private fun addAdapter(rv: RecyclerView, list: String, list2: String) {
+        rv.adapter =
+            WordsItemAdapter(
+                list,
+                list2,
+                layoutRes,
+                wordPosition
+            )
+        (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
+    }
+
+    private fun loadSheets(pos: Int) {
         val transport = AndroidHttp.newCompatibleTransport()
         val factory = JacksonFactory.getDefaultInstance()
         val sheetsService = Sheets.Builder(transport, factory, null)
@@ -226,7 +188,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d("SheetString", sheetsList[1][2]);
                     Log.d("SheetString", sheetsList[1][3]);
 
-
                     wordPosition = pos
 
                 } catch (e: Exception) {
@@ -237,7 +198,6 @@ class MainActivity : AppCompatActivity() {
 
         }.start()
     }
-
 
 
 }
