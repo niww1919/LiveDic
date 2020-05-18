@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.json.jackson2.JacksonFactory
-import com.google.api.services.sheets.v4.Sheets
+//import com.google.api.services.sheets.v4.Sheets
 import com.my.livedic.R
 import com.my.livedic.adapters.WordsItemAdapter
 import java.lang.Exception
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val mSettings = getSharedPreferences(APP_COUNTS_WORDS, Context.MODE_PRIVATE)
         val editor = mSettings.edit()
 
-        loadSheets(mSettings.getInt(APP_COUNTS_WORDS, 0))
+//        loadSheets(mSettings.getInt(APP_COUNTS_WORDS, 0))
 
         super.onCreate(savedInstanceState)
 
@@ -172,46 +172,46 @@ class MainActivity : AppCompatActivity() {
         (rv.adapter as WordsItemAdapter).notifyDataSetChanged()
     }
 
-    private fun loadSheets(pos: Int) {
-        val transport = AndroidHttp.newCompatibleTransport()
-        val factory = JacksonFactory.getDefaultInstance()
-        val sheetsService = Sheets.Builder(transport, factory, null)
-            .setApplicationName("LiveDic")
-            .build()
-
-        val spreadSheetsId = "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
-
-        Thread {
-            run {
-                try {
-                    val range = "Sheet1!A1:D336"//fixme change table range
-                    val result =
-                        sheetsService.spreadsheets().values().get(spreadSheetsId, range)
-                            .setKey(KEY)
-                            .execute()
-
-                    val numRows = result.getValues().size
-                    Log.i("SUCCESSGOOD", "rows retrived " + numRows);
-
-//                    int = numRows
-                    sheetsList.addAll(result?.getValues() as MutableList<MutableList<String>>)
-                    Log.d("SheetString", sheetsList[0].toString());
-                    Log.d("SheetString", sheetsList[1].size.toString());
-                    Log.d("SheetString", sheetsList[1][0]);
-                    Log.d("SheetString", sheetsList[1][1]);
-                    Log.d("SheetString", sheetsList[1][2]);
-                    Log.d("SheetString", sheetsList[1][3]);
-
-                    wordPosition = pos
-
-                } catch (e: Exception) {
-                    Log.d("FALSE.", "rows retrived ");
-                }
-
-            }
-
-        }.start()
-    }
+//    private fun loadSheets(pos: Int) {
+//        val transport = AndroidHttp.newCompatibleTransport()
+//        val factory = JacksonFactory.getDefaultInstance()
+//        val sheetsService = Sheets.Builder(transport, factory, null)
+//            .setApplicationName("LiveDic")
+//            .build()
+//
+//        val spreadSheetsId = "1xEJ6tdsL758B-n1axU1vCxcfiOl8Aml1AiOzx_WWg28"
+//
+//        Thread {
+//            run {
+//                try {
+//                    val range = "Sheet1!A1:D336"//fixme change table range
+//                    val result =
+//                        sheetsService.spreadsheets().values().get(spreadSheetsId, range)
+//                            .setKey(KEY)
+//                            .execute()
+//
+//                    val numRows = result.getValues().size
+//                    Log.i("SUCCESSGOOD", "rows retrived " + numRows);
+//
+////                    int = numRows
+//                    sheetsList.addAll(result?.getValues() as MutableList<MutableList<String>>)
+//                    Log.d("SheetString", sheetsList[0].toString());
+//                    Log.d("SheetString", sheetsList[1].size.toString());
+//                    Log.d("SheetString", sheetsList[1][0]);
+//                    Log.d("SheetString", sheetsList[1][1]);
+//                    Log.d("SheetString", sheetsList[1][2]);
+//                    Log.d("SheetString", sheetsList[1][3]);
+//
+//                    wordPosition = pos
+//
+//                } catch (e: Exception) {
+//                    Log.d("FALSE.", "rows retrived ");
+//                }
+//
+//            }
+//
+//        }.start()
+//    }
 
 
 }
