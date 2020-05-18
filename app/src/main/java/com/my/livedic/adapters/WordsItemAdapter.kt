@@ -1,4 +1,4 @@
-package com.my.livedic
+package com.my.livedic.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

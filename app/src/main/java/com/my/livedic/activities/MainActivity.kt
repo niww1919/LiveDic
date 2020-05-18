@@ -1,8 +1,6 @@
-package com.my.livedic
+package com.my.livedic.activities
 
 import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -12,10 +10,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.sheets.v4.Sheets
+import com.my.livedic.R
+import com.my.livedic.adapters.WordsItemAdapter
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
@@ -82,11 +81,12 @@ class MainActivity : AppCompatActivity() {
                         addAdapter(rv, sheetsList[wordPosition][2], sheetsList[wordPosition][3])
                     }
 
-                    if (wordPosition > 1) {
+                    Log.d("wordPosition.", wordPosition.toString() + sheetsList[wordPosition][3])
+                    if (wordPosition < sheetsList.size -1) {
                         wordPosition++
-                        Log.d("wordPosition.", wordPosition.toString() + sheetsList[wordPosition][2]);
 
                     }
+
                 }
                 if (direction == ItemTouchHelper.LEFT) {
 
@@ -106,6 +106,7 @@ class MainActivity : AppCompatActivity() {
                             " ".count {
                                 sheetsList[wordPosition][3].contains(it)
                             } >= 2) {
+
                             wordPosition--
                         }
                     }
@@ -115,9 +116,22 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         addAdapter(rv, sheetsList[wordPosition][2], sheetsList[wordPosition][3])
                     }
+                    Log.d(
+                        "wordPosition.",
+                        wordPosition.toString() + sheetsList[wordPosition][3]
+                    )
+                    Log.d("countprobel.", sheetsList[wordPosition][3].contains(
+                        " ",
+                        true
+                    ).toString())
+                    Log.d("countprobel.", " ".count {
+                        sheetsList[wordPosition][3].contains(it)
+                    }.toString())
+                    Log.d("countprobel.", " ".filter {
+                        sheetsList[wordPosition][3].contains(it)
+                    }.length.toString())
                     if (wordPosition > 1) {
                         wordPosition--
-                        Log.d("wordPosition.", wordPosition.toString() + sheetsList[wordPosition][2]);
                     }
 
                 }
@@ -134,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             chip2.isChecked = false
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
-                addAdapter(rv,sheetsList[wordPosition][2],sheetsList[wordPosition][3])
+                addAdapter(rv, sheetsList[wordPosition][2], sheetsList[wordPosition][3])
             })
         }
         chip2.setOnClickListener {
@@ -142,7 +156,7 @@ class MainActivity : AppCompatActivity() {
 
             Handler(Looper.getMainLooper()).post(Runnable {
                 rv.layoutManager = linearLayoutManager
-                addAdapter(rv,sheetsList[wordPosition][3],sheetsList[wordPosition][2])
+                addAdapter(rv, sheetsList[wordPosition][3], sheetsList[wordPosition][2])
             })
         }
     }
@@ -170,7 +184,7 @@ class MainActivity : AppCompatActivity() {
         Thread {
             run {
                 try {
-                    val range = "Sheet1!A1:D296"//fixme change table range
+                    val range = "Sheet1!A1:D336"//fixme change table range
                     val result =
                         sheetsService.spreadsheets().values().get(spreadSheetsId, range)
                             .setKey(KEY)
