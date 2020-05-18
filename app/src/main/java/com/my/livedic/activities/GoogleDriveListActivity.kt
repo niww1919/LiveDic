@@ -38,14 +38,14 @@ class GoogleDriveListActivity :AppCompatActivity(), CoroutineScope by MainScope(
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d("LOG", "$requestCode")
+        Log.d("Logdrive", "$requestCode")
         when(requestCode) {
             REQUEST_SIGN_IN -> {
                 if (resultCode == RESULT_OK && data != null) {
                     handleSignInResult(data)
                 }
                 else {
-                    Log.d("LOG", "Signin request failed")
+                    Log.d("Logdrive", "Signin request failed")
 
                 }
             }
@@ -65,7 +65,7 @@ class GoogleDriveListActivity :AppCompatActivity(), CoroutineScope by MainScope(
     private fun handleSignInResult(result: Intent) {
         GoogleSignIn.getSignedInAccountFromIntent(result)
             .addOnSuccessListener { googleAccount ->
-                Log.d("LOG", "Signin successful")
+                Log.d("Logdrive", "Signin successful")
 
 
                 // Use the authenticated account to sign in to the Drive service.
@@ -84,25 +84,49 @@ class GoogleDriveListActivity :AppCompatActivity(), CoroutineScope by MainScope(
                 // https://developers.google.com/drive/api/v3/search-files
                 // https://developers.google.com/drive/api/v3/search-parameters
                 // https://developers.google.com/drive/api/v3/mime-types
+                Thread{
+                    run {
+                        try {
+                            var pageToken: String? = null
+                            do {
+                                val result = googleDriveService.files().list().apply {
+                                    q = "mimeType='application/vnd.google-apps.spreadsheet'"
+                                    spaces = "drive"
+                                    fields = "nextPageToken, files(id, name)"
+                                    this.pageToken = pageToken
+                                }.execute()
+                                for (file in result.files) {
 
-                launch(Dispatchers.Default) {
-                    var pageToken: String? = null
-                    do {
-                        val result = googleDriveService.files().list().apply {
-                            q = "mimeType='application/vnd.google-apps.spreadsheet'"
-                            spaces = "drive"
-                            fields = "nextPageToken, files(id, name)"
-                            this.pageToken = pageToken
-                        }.execute()
-                        for (file in result.files) {
+                                    Log.d("Logdrive","name=${file.name}, id=${file.id}")
+                                }
+                            } while (pageToken != null)
 
-                            Log.d("LOGG","name=${file.name}, id=${file.id}")
+                        }catch (e: Exception) {
+                            Log.d("Logdrive", "rows retrived ");
                         }
-                    } while (pageToken != null)
+                    }
                 }
+
+
+
+//                launch(Dispatchers.Default) {
+//                    var pageToken: String? = null
+//                    do {
+//                        val result = googleDriveService.files().list().apply {
+//                            q = "mimeType='application/vnd.google-apps.spreadsheet'"
+//                            spaces = "drive"
+//                            fields = "nextPageToken, files(id, name)"
+//                            this.pageToken = pageToken
+//                        }.execute()
+//                        for (file in result.files) {
+//
+//                            Log.d("LOGG","name=${file.name}, id=${file.id}")
+//                        }
+//                    } while (pageToken != null)
+//                }
             }
             .addOnFailureListener { e ->
-                Log.e("LOG", "Signin error")
+                Log.e("Logdrive", "Signin error")
             }
     }
     private fun requestSignIn() {
