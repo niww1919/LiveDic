@@ -102,10 +102,10 @@ class GoogleDriveListActivity :AppCompatActivity(), CoroutineScope by MainScope(
                             } while (pageToken != null)
 
                         }catch (e: Exception) {
-                            Log.d("Logdrive", "rows retrived ");
+                            Log.d("Logdrive", "$e ");
                         }
                     }
-                }
+                }.start()
 
 
 
